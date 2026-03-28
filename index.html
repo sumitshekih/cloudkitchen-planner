@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Kitchen Launch Planner - Monk Kitchen</title>
+    <style>
+        :root {
+            --primary: #e8590c;
+            --primary-light: #fff4e6;
+            --primary-dark: #d9480f;
+            --accent: #2b8a3e;
+            --accent-light: #ebfbee;
+            --bg: #fafafa;
+            --card: #ffffff;
+            --text: #212529;
+            --text-light: #868e96;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --phase2: #7048e8;
+            --phase2-light: #f3f0ff;
+            --warning: #e67700;
+            --warning-light: #fff9db;
+            --info: #1971c2;
+            --info-light: #e7f5ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #c2255c 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.15em;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.85;
+            font-size: 0.78em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .progress-bar-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            height: 6px;
+            width: 160px;
+        }
+
+        .progress-bar {
+            background: white;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.72em;
+            opacity: 0.85;
+            white-space: nowrap;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            overflow-x: auto;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 46px;
+            z-index: 99;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-item {
+            padding: 12px 18px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover { color: var(--primary); }
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-item .nav-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.7em;
+            padding: 1px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+
+        /* Content */
+        .container { max-width: 900px; margin: 0 auto; padding: 20px 16px 100px; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+
+        .card-header h3 { font-size: 1.1em; font-weight: 600; }
+        .card-header .subtitle { font-size: 0.8em; color: var(--text-light); }
+
+        /* Name Cards */
+        .name-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .name-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .name-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .name-card.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .name-card .name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .name-card .tagline {
+            font-size: 0.85em;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .name-card .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .tag-bold { background: #fff3bf; color: #e67700; }
+        .tag-desi { background: #ffe8cc; color: #d9480f; }
+        .tag-top { background: #d3f9d8; color: #2b8a3e; }
+
+        /* Checklist */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .checklist-item:hover { background: #f1f3f5; }
+
+        .checklist-item.completed {
+            background: var(--accent-light);
+            text-decoration: none;
+        }
+
+        .checklist-item.completed .item-title {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+
+        .check-box {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+            transition: all 0.2s;
+        }
+
+        .checklist-item.completed .check-box {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .item-title { font-weight: 600; font-size: 0.95em; }
+        .item-desc { font-size: 0.82em; color: var(--text-light); margin-top: 2px; }
+        .item-cost { font-size: 0.8em; color: var(--primary); font-weight: 600; margin-top: 4px; }
+
+        /* Steps */
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+
+        .step-number.zomato { background: #e23744; }
+        .step-number.swiggy { background: #fc8019; }
+        .step-number.phase2 { background: var(--phase2); }
+
+        .step-content { flex: 1; }
+        .step-content h4 { font-size: 0.95em; margin-bottom: 4px; }
+        .step-content p { font-size: 0.85em; color: var(--text-light); }
+        .step-content ul { font-size: 0.85em; color: var(--text-light); padding-left: 16px; margin-top: 4px; }
+        .step-content li { margin-bottom: 3px; }
+
+        /* Info boxes */
+        .info-box {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 0.88em;
+        }
+
+        .info-box.tip { background: var(--accent-light); border-left: 4px solid var(--accent); }
+        .info-box.warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+        .info-box.info { background: var(--info-light); border-left: 4px solid var(--info); }
+        .info-box.phase2-box { background: var(--phase2-light); border-left: 4px solid var(--phase2); }
+
+        .info-box strong { display: block; margin-bottom: 2px; }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; margin: 12px 0; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88em;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.85em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover td { background: #f8f9fa; }
+
+        /* Quantity Cards */
+        .qty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .qty-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .qty-card .emoji { font-size: 2em; margin-bottom: 6px; }
+        .qty-card .item-name { font-weight: 600; font-size: 0.95em; }
+        .qty-card .quantity { font-size: 1.4em; font-weight: 700; color: var(--primary); margin: 4px 0; }
+        .qty-card .note { font-size: 0.78em; color: var(--text-light); }
+
+        /* Week progression */
+        .week-row {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0;
+            align-items: center;
+        }
+
+        .week-label {
+            font-size: 0.82em;
+            font-weight: 600;
+            width: 70px;
+            flex-shrink: 0;
+        }
+
+        .week-bar {
+            flex: 1;
+            height: 24px;
+            background: var(--primary-light);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .week-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #c2255c);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.72em;
+            font-weight: 600;
+        }
+
+        /* Budget */
+        .budget-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .budget-row:last-child { border-bottom: none; }
+        .budget-label { font-size: 0.9em; }
+        .budget-amount { font-weight: 700; color: var(--primary); }
+        .budget-total { font-size: 1.2em; color: var(--primary-dark); padding-top: 12px; border-top: 2px solid var(--primary); }
+
+        /* Section divider */
+        .section-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--text);
+            margin: 24px 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        /* Highlight tag */
+        .highlight {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        /* Phase badge */
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .phase-1 { background: var(--primary-light); color: var(--primary); }
+        .phase-2 { background: var(--phase2-light); color: var(--phase2); }
+
+        /* Document list */
+        .doc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .doc-list li {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 0.88em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .doc-list li::before {
+            content: "📄";
+            flex-shrink: 0;
+        }
+
+        /* Reset button */
+        .reset-btn {
+            background: none;
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.82em;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            border-color: #e03131;
+            color: #e03131;
+        }
+
+        /* Quick Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .summary-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-item .label { font-size: 0.75em; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-item .value { font-size: 1.2em; font-weight: 700; color: var(--primary); margin-top: 4px; }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        .timeline-item.done::before { background: var(--accent); }
+
+        .timeline-item h4 { font-size: 0.92em; }
+        .timeline-item p { font-size: 0.82em; color: var(--text-light); }
+        .timeline-item .days { font-size: 0.75em; color: var(--primary); font-weight: 600; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.4em; }
+            .nav-item { padding: 10px 14px; font-size: 0.8em; }
+            .card { padding: 18px; }
+            .name-grid { grid-template-columns: 1fr; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .qty-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media print {
+            .header { position: static; }
+            .nav { display: none; }
+            .page { display: block !important; page-break-before: always; }
+            .checklist-item { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <div>
+            <h1>Cloud Kitchen Launch Planner</h1>
+            <p>Roopena Agrahara, Bangalore | North Indian</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0/0</div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav" id="mainNav">
+    <div class="nav-item active" data-page="overview">Overview</div>
+    <div class="nav-item" data-page="names">Brand Name</div>
+    <div class="nav-item" data-page="certificates">Certificates</div>
+    <div class="nav-item" data-page="zomato">Zomato</div>
+    <div class="nav-item" data-page="swiggy">Swiggy</div>
+    <div class="nav-item" data-page="day1">Day 1 Plan</div>
+    <div class="nav-item" data-page="budget">Budget</div>
+    <div class="nav-item" data-page="alcohol">Phase 2: Alcohol</div>
+    <div class="nav-item" data-page="checklist">Master Checklist</div>
+</div>
+
+<div class="container">
+
+<!-- ==================== OVERVIEW PAGE ==================== -->
+<div class="page active" id="page-overview">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">🚀</div>
+            <div>
+                <h3>Your Cloud Kitchen at a Glance</h3>
+                <div class="subtitle">Everything you need to launch successfully</div>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="label">Budget</div>
+                <div class="value">Under 2L</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Team</div>
+                <div class="value">2-3</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Cuisine</div>
+                <div class="value">North Indian</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Hours</div>
+                <div class="value">11AM-11PM</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Platforms</div>
+                <div class="value">Zomato + Swiggy</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Location</div>
+                <div class="value">Roopena Agrahara</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--info-light); color: var(--info);">📋</div>
+            <div>
+                <h3>Launch Timeline (Estimated)</h3>
+                <div class="subtitle">From today to your first order</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>Week 1-2: Documentation & Registration</h4>
+                <p>FSSAI registration, GST registration, Udyam update, rent agreement</p>
+                <span class="days">~10-14 days</span>
+            </div>
+            <div class="timeline-item">
+                <h4>Week 2-3: Platform Onboarding</h4>
+                <p>Register on Zomato & Swiggy, submit documents, menu setup</p>
+                <span class="days">~7-10 days</span>
+            </div>
+            <div class="timeline-item">
+                <h4>Week 3: Kitchen Final Setup</h4>
+                <p>Equipment check, packaging materials, raw material sourcing, trial cooking</p>
+                <span class="days">~5-7 days</span>
+            </div>
+            <div class="timeline-item">
+                <h4>Week 4: Soft Launch</h4>
+                <p>Go live on Zomato & Swiggy, start with limited menu, test operations</p>
+                <span class="days">Day 1!</span>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Pro Tip:</strong> Many tasks can be done in parallel. Start FSSAI registration first (takes longest) while you prepare everything else.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--accent-light); color: var(--accent);">🍽️</div>
+            <div>
+                <h3>Your Menu Focus</h3>
+                <div class="subtitle">Phase 1 - Core items to start lean</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Type</th>
+                        <th>Suggested Price (MRP)</th>
+                        <th>Zomato/Swiggy Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Mutton Curry + Rice</td><td>Meal</td><td>₹280-350</td><td>₹320-400</td></tr>
+                    <tr><td>Mutton Curry + 4 Chapati</td><td>Meal</td><td>₹280-350</td><td>₹320-400</td></tr>
+                    <tr><td>Chicken Curry + Rice</td><td>Meal</td><td>₹180-220</td><td>₹220-260</td></tr>
+                    <tr><td>Chicken Curry + 4 Chapati</td><td>Meal</td><td>₹180-220</td><td>₹220-260</td></tr>
+                    <tr><td>Butter Chicken + Rice</td><td>Meal</td><td>₹200-250</td><td>₹240-290</td></tr>
+                    <tr><td>Chicken Biryani</td><td>Single</td><td>₹180-220</td><td>₹220-260</td></tr>
+                    <tr><td>Mutton Biryani</td><td>Single</td><td>₹280-350</td><td>₹320-400</td></tr>
+                    <tr><td>Egg Curry + Rice</td><td>Meal (Budget)</td><td>₹120-150</td><td>₹150-180</td></tr>
+                    <tr><td>Extra Chapati (2 pcs)</td><td>Add-on</td><td>₹30-40</td><td>₹40-50</td></tr>
+                    <tr><td>Extra Rice</td><td>Add-on</td><td>₹40-50</td><td>₹50-60</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Pricing Strategy:</strong> Zomato & Swiggy charge 18-25% commission. Your platform price should be 20-30% higher than your walk-in MRP to cover this. Keep food cost under 35-40% of selling price.
+        </div>
+    </div>
+</div>
+
+<!-- ==================== BRAND NAME PAGE ==================== -->
+<div class="page" id="page-names">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">🏷️</div>
+            <div>
+                <h3>Brand Name Suggestions</h3>
+                <div class="subtitle">Click to select your favorite - includes "Monk" as requested</div>
+            </div>
+        </div>
+
+        <h4 style="margin-bottom: 12px; color: var(--warning);">🔥 Fun & Bold Names</h4>
+        <div class="name-grid" style="margin-bottom: 24px;">
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Hungry Monk</div>
+                <div class="tagline">"Where cravings meet karma"</div>
+                <span class="tag tag-top">TOP PICK</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Masala Monk</div>
+                <div class="tagline">"Spice is our meditation"</div>
+                <span class="tag tag-bold">FUN & CATCHY</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">The Spicy Monk</div>
+                <div class="tagline">"Enlightened flavors, fiery soul"</div>
+                <span class="tag tag-bold">BOLD</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Monk's Feast</div>
+                <div class="tagline">"A feast worth the wait"</div>
+                <span class="tag tag-bold">HEARTY</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Monk & Meat</div>
+                <div class="tagline">"The ultimate non-veg paradise"</div>
+                <span class="tag tag-bold">DIRECT</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Flame Monk</div>
+                <div class="tagline">"Cooked with fire, served with soul"</div>
+                <span class="tag tag-bold">EDGY</span>
+            </div>
+        </div>
+
+        <h4 style="margin-bottom: 12px; color: var(--primary-dark);">👑 Desi & Classy Names</h4>
+        <div class="name-grid" style="margin-bottom: 24px;">
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Monk ka Zaika</div>
+                <div class="tagline">"Desi taste, monk's dedication"</div>
+                <span class="tag tag-top">TOP DESI PICK</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Royal Monk Kitchen</div>
+                <div class="tagline">"Where royalty meets simplicity"</div>
+                <span class="tag tag-desi">PREMIUM</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Monk's Dastarkhwan</div>
+                <div class="tagline">"A spread fit for kings"</div>
+                <span class="tag tag-desi">MUGHLAI VIBE</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Desi Monk</div>
+                <div class="tagline">"Apna khana, apna andaaz"</div>
+                <span class="tag tag-desi">DESI SWAG</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Monk's Rasoi</div>
+                <div class="tagline">"Ghar jaisa khana, monk ki seva"</div>
+                <span class="tag tag-desi">HOMELY</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Shahi Monk</div>
+                <div class="tagline">"Mughlai grandeur, monk's perfection"</div>
+                <span class="tag tag-desi">CLASSY</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Monk's Bhoj</div>
+                <div class="tagline">"Every meal is a celebration"</div>
+                <span class="tag tag-desi">FESTIVE</span>
+            </div>
+            <div class="name-card" onclick="selectName(this)">
+                <div class="name">Tandoori Monk</div>
+                <div class="tagline">"Fired up. Flavored right."</div>
+                <span class="tag tag-desi">NORTH INDIAN</span>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Before Finalizing:</strong>
+            <ul style="margin-top: 6px; padding-left: 16px; font-size: 0.9em;">
+                <li>Search the name on Zomato & Swiggy to check if it's already taken in Bangalore</li>
+                <li>Check domain availability (for future website)</li>
+                <li>Check Instagram/social media handle availability</li>
+                <li>The name should be easy to spell & remember for food ordering</li>
+                <li>For alcohol phase later, avoid names that sound purely religious</li>
+            </ul>
+        </div>
+
+        <div id="selectedNameDisplay" style="display:none; margin-top: 16px; padding: 16px; background: var(--accent-light); border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.8em; color: var(--accent);">YOUR SELECTED NAME</div>
+            <div id="selectedNameText" style="font-size: 1.5em; font-weight: 700; color: var(--accent);"></div>
+            <div style="font-size: 0.82em; color: var(--text-light); margin-top: 4px;">Saved to your browser! This will be remembered.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CERTIFICATES PAGE ==================== -->
+<div class="page" id="page-certificates">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fff3bf; color: #e67700;">📜</div>
+            <div>
+                <h3>All Certificates & Licenses Required</h3>
+                <div class="subtitle">Complete list for cloud kitchen in Bangalore, Karnataka</div>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <strong>Order of Priority:</strong> Start with FSSAI Registration first (takes 7-15 days). Apply for GST simultaneously. Other certificates can be done in parallel.
+        </div>
+    </div>
+
+    <!-- FSSAI -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #d3f9d8; color: #2b8a3e;">1</div>
+            <div>
+                <h3>FSSAI Registration (Food License)</h3>
+                <div class="subtitle">MANDATORY - Cannot operate without this</div>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <strong>Which type do you need?</strong>
+            For annual turnover up to ₹12 Lakh → <b>FSSAI Basic Registration</b> (this is what you need to start). Once turnover crosses ₹12 Lakh → upgrade to FSSAI State License.
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Visit FSSAI Portal</h4>
+                <p>Go to <b>foscos.fssai.gov.in</b> → Click "Apply for License/Registration"</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Create Account & Select "Registration"</h4>
+                <p>Sign up with mobile + email → Select "Registration" (not License) → Choose "Catering / Cloud Kitchen"</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Fill Application Form A</h4>
+                <p>Business name, address (Roopena Agrahara), proprietor details, food category (non-veg meals)</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Upload Documents</h4>
+                <ul>
+                    <li>Aadhaar card of proprietor</li>
+                    <li>PAN card</li>
+                    <li>Passport size photo</li>
+                    <li>Proof of business address (rent agreement / utility bill)</li>
+                    <li>List of food items to be sold</li>
+                </ul>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h4>Pay Fee & Submit</h4>
+                <p>Fee: <b>₹100/year</b> for basic registration (1-5 year options). Usually ₹500 for 5 years.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">6</div>
+            <div class="step-content">
+                <h4>Get Registration Certificate</h4>
+                <p>Processing time: <b>7-15 working days</b>. You'll get a 14-digit FSSAI number. Display this in your kitchen & on all packaging.</p>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Important:</strong> You MUST print the FSSAI number on all packaging and display the certificate in the kitchen. Zomato & Swiggy will not onboard you without a valid FSSAI number.
+        </div>
+    </div>
+
+    <!-- GST -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--info-light); color: var(--info);">2</div>
+            <div>
+                <h3>GST Registration</h3>
+                <div class="subtitle">Required for Zomato/Swiggy even if turnover is low</div>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <strong>Why needed immediately?</strong> Even though GST threshold is ₹20L turnover in Karnataka, Zomato & Swiggy require GST number for restaurant onboarding. GST rate for restaurants (non-AC, no liquor): <b>5% without ITC</b>.
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Visit GST Portal</h4>
+                <p>Go to <b>gst.gov.in</b> → Services → Registration → New Registration</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Fill Part A</h4>
+                <p>PAN, mobile number, email → You'll receive OTP on both → Submit to get TRN (Temporary Reference Number)</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Fill Part B with Documents</h4>
+                <ul>
+                    <li>PAN card</li>
+                    <li>Aadhaar card</li>
+                    <li>Business address proof (rent agreement + utility bill)</li>
+                    <li>Bank account details (cancelled cheque / passbook)</li>
+                    <li>Photo of proprietor</li>
+                    <li>HSN Code: <b>9963</b> (Food & beverage services)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Verification & GSTIN</h4>
+                <p>E-sign with Aadhaar OTP → Processing: <b>3-7 working days</b> → You'll receive GSTIN</p>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>GST Filing:</strong> You'll need to file GST returns monthly (GSTR-1 & GSTR-3B). Consider hiring a CA or use ClearTax/Zoho for ₹500-1000/month. As a 5% restaurant, you CANNOT claim Input Tax Credit.
+        </div>
+    </div>
+
+    <!-- Udyam Update -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #e7f5ff; color: #1971c2;">3</div>
+            <div>
+                <h3>Update Existing Udyam Certificate</h3>
+                <div class="subtitle">Add cloud kitchen activity to family member's existing Udyam</div>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Since Udyam is under a family member's name:</strong> You have 2 options. Either add cloud kitchen as additional activity to their existing Udyam OR register a new Udyam under your own name. If your family member's Udyam is a sole proprietorship, you CANNOT add a different person's business to it. Better to get your own.
+        </div>
+
+        <h4 style="margin: 16px 0 10px;">Option A: Add Activity to Existing Udyam</h4>
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Login to Udyam Portal</h4>
+                <p>Go to <b>udyamregistration.gov.in</b> → Click "Update Udyam Registration"</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Enter Udyam Number + OTP</h4>
+                <p>Enter existing Udyam number → OTP will be sent to registered mobile</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Add New Activity (NIC Code)</h4>
+                <p>Add NIC Code: <b>56101</b> (Restaurants and mobile food service activities) → Add new unit address (Roopena Agrahara kitchen)</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Submit & Download Updated Certificate</h4>
+                <p>Changes reflect <b>immediately</b>. Download updated certificate.</p>
+            </div>
+        </div>
+
+        <h4 style="margin: 16px 0 10px;">Option B: Register New Udyam (Recommended)</h4>
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Register Fresh Udyam Under Your Aadhaar</h4>
+                <p>Go to <b>udyamregistration.gov.in</b> → "For New Entrepreneurs" → Enter your Aadhaar + PAN</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Fill Details</h4>
+                <p>Business name (your chosen cloud kitchen name) → NIC Code: 56101 → Investment & turnover details → Cloud kitchen address</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Get Udyam Certificate</h4>
+                <p><b>Instant</b> - Free of cost. You'll get Udyam Registration Number immediately.</p>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Benefits of Udyam:</strong> MSME benefits, easier bank loans, government scheme eligibility, tax benefits. It's FREE and instant - no reason not to get your own.
+        </div>
+    </div>
+
+    <!-- Rent Agreement -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fff3bf; color: #e67700;">4</div>
+            <div>
+                <h3>Rent Agreement (Pending!)</h3>
+                <div class="subtitle">DO THIS FIRST - Most other registrations need this</div>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>You mentioned agreement is not done yet.</strong> This is blocking! Almost every registration (FSSAI, GST, Zomato, Swiggy) needs proof of business address. Get this done ASAP.
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Draft Rent Agreement</h4>
+                <p>Must mention: commercial use / food business / cloud kitchen operation explicitly</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Get it on Stamp Paper</h4>
+                <p>Karnataka: ₹200-500 stamp paper. Both parties sign. Needs 2 witnesses.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Register Online (Optional but Recommended)</h4>
+                <p>Register on <b>kaveri.karnataka.gov.in</b> (Karnataka e-stamp portal). Registration fee: 1% of annual rent. Registered agreements are legally stronger.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Keep Multiple Copies</h4>
+                <p>You'll need copies for: FSSAI, GST, Zomato, Swiggy, Bank account, and Trade License</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade License -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #e7f5ff; color: #1971c2;">5</div>
+            <div>
+                <h3>BBMP Trade License</h3>
+                <div class="subtitle">Municipal license to operate commercial food business in Bangalore</div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Apply Online on BBMP Portal</h4>
+                <p>Go to <b>bbmponline.karnataka.gov.in</b> → Trade License → New Application</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Documents Needed</h4>
+                <ul>
+                    <li>ID proof (Aadhaar)</li>
+                    <li>Address proof of premises</li>
+                    <li>Rent agreement</li>
+                    <li>NOC from landlord</li>
+                    <li>2 passport photos</li>
+                    <li>Property tax receipt (ask landlord)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Pay Fee & Get License</h4>
+                <p>Fee: ₹500-2000 (depends on area). Processing: 7-15 days. Annual renewal needed.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Certificates -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #f8f9fa; color: var(--text-light);">+</div>
+            <div>
+                <h3>Additional Certificates (Good to Have)</h3>
+                <div class="subtitle">Not immediately mandatory but helpful</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Certificate</th><th>Why</th><th>Cost</th><th>Priority</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Fire NOC</b></td>
+                        <td>Required if kitchen uses commercial gas. Apply at Karnataka Fire & Emergency Services</td>
+                        <td>₹500-2000</td>
+                        <td><span class="highlight">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Shop & Establishment Act</b></td>
+                        <td>Register under Karnataka Shops & Commercial Establishments Act within 30 days of starting</td>
+                        <td>₹200-500</td>
+                        <td><span class="highlight">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Signage License</b></td>
+                        <td>BBMP license if you put up any signboard outside</td>
+                        <td>₹500-1000</td>
+                        <td>Low (cloud kitchen)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Pollution NOC</b></td>
+                        <td>From Karnataka State Pollution Control Board if using heavy machinery / chimney</td>
+                        <td>₹1000-5000</td>
+                        <td>Low (small kitchen)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Current Bank Account</b></td>
+                        <td>Open business current account for Zomato/Swiggy payouts</td>
+                        <td>Free</td>
+                        <td><span style="color:red;font-weight:700;">High</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Current Account Tip:</strong> Open a current account in your cloud kitchen's business name. Zomato & Swiggy will deposit payments here. Keep personal and business finances separate from day 1. Most banks require: PAN, Aadhaar, GST certificate, Udyam, rent agreement.
+        </div>
+    </div>
+
+    <!-- Documents Needed Summary -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">📎</div>
+            <div>
+                <h3>Master Document Checklist</h3>
+                <div class="subtitle">Keep these ready - you'll need them repeatedly</div>
+            </div>
+        </div>
+
+        <ul class="doc-list">
+            <li>Aadhaar Card (self) - original + 5 photocopies</li>
+            <li>PAN Card - original + 5 photocopies</li>
+            <li>Passport Size Photos - at least 10 copies</li>
+            <li>Rent Agreement (registered) - original + 5 copies</li>
+            <li>Landlord NOC (No Objection Certificate)</li>
+            <li>Property Tax Receipt (from landlord)</li>
+            <li>Electricity Bill of premises (for address proof)</li>
+            <li>Bank Account Passbook / Cancelled Cheque</li>
+            <li>Menu List with food items</li>
+            <li>Kitchen Layout / Floor Plan (simple hand-drawn is fine)</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ==================== ZOMATO PAGE ==================== -->
+<div class="page" id="page-zomato">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fce4ec; color: #e23744;">🔴</div>
+            <div>
+                <h3>Zomato Restaurant Partner Onboarding</h3>
+                <div class="subtitle">Complete step-by-step process</div>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <strong>Zomato Commission:</strong> 18-25% per order (varies by plan). They deduct commission + GST on commission before paying you. Payout cycle: Weekly (every Monday for previous week's orders).
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">1</div>
+            <div class="step-content">
+                <h4>Register on Zomato for Business</h4>
+                <p>Visit <b>zomato.com/business</b> or download <b>"Zomato Restaurant Partner"</b> app from Play Store. Click "Register Your Restaurant".</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">2</div>
+            <div class="step-content">
+                <h4>Fill Basic Details</h4>
+                <ul>
+                    <li>Restaurant name (your cloud kitchen name)</li>
+                    <li>Complete address with PIN code (Roopena Agrahara, 560068)</li>
+                    <li>Restaurant type: <b>"Cloud Kitchen / Delivery Only"</b></li>
+                    <li>Cuisine: <b>North Indian, Biryani, Mughlai</b></li>
+                    <li>Owner name, mobile number, email</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">3</div>
+            <div class="step-content">
+                <h4>Upload Documents</h4>
+                <ul>
+                    <li><b>FSSAI License/Registration</b> (14-digit number)</li>
+                    <li><b>GST Certificate</b> (GSTIN number)</li>
+                    <li><b>PAN Card</b></li>
+                    <li><b>Bank Account Details</b> (for payouts - cancelled cheque)</li>
+                    <li><b>Menu</b> (items with prices)</li>
+                    <li><b>Restaurant Photos</b> (kitchen setup)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">4</div>
+            <div class="step-content">
+                <h4>Zomato Verification Visit</h4>
+                <p>Zomato team may visit your kitchen to verify hygiene standards. Keep kitchen clean, organized, and have all documents ready. They check:</p>
+                <ul>
+                    <li>Kitchen cleanliness & hygiene</li>
+                    <li>Proper storage of raw materials</li>
+                    <li>Handwash facility</li>
+                    <li>Separate veg/non-veg preparation areas (ideal)</li>
+                    <li>FSSAI certificate displayed</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">5</div>
+            <div class="step-content">
+                <h4>Menu Setup on Zomato Dashboard</h4>
+                <p>Once approved, log into <b>Zomato Restaurant Dashboard</b>:</p>
+                <ul>
+                    <li>Add menu items with names, descriptions, prices</li>
+                    <li>Upload food photos (Zomato may offer FREE photoshoot - ask!)</li>
+                    <li>Set item availability (lunch/dinner/all day)</li>
+                    <li>Mark items as Veg/Non-Veg/Egg</li>
+                    <li>Set preparation time for each item</li>
+                    <li>Add add-ons & combos</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">6</div>
+            <div class="step-content">
+                <h4>Set Operating Hours</h4>
+                <p>Set your operating hours: <b>11:00 AM - 11:00 PM</b>. You can go offline anytime from the dashboard if you run out of stock.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">7</div>
+            <div class="step-content">
+                <h4>Delivery Radius Setup</h4>
+                <p>Zomato will set a default delivery radius (~5-7 km from Roopena Agrahara). This covers: Electronic City, BTM Layout, HSR Layout, Bommanahalli, Madiwala area.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number zomato">8</div>
+            <div class="step-content">
+                <h4>Go Live!</h4>
+                <p>Total onboarding time: <b>7-15 days</b> after document submission. Once live, manage orders from the Zomato Restaurant Partner app.</p>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Zomato Tips for New Restaurants:</strong>
+            <ul style="margin-top: 6px; padding-left: 16px; font-size: 0.9em;">
+                <li><b>First 2 weeks:</b> Zomato gives new restaurants better visibility (boost period)</li>
+                <li>Accept ALL orders in the first month - high acceptance rate = better ranking</li>
+                <li>Keep preparation time LOW (under 20 min) - faster delivery = more orders</li>
+                <li>Reply to all reviews (especially negative ones) professionally</li>
+                <li>Enable Zomato Gold/Pro deals initially to attract first-time customers</li>
+                <li>Offer combos/meal deals - they rank higher in search</li>
+            </ul>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Zomato Payment Cycle:</strong> Zomato pays weekly every Monday. First payout may take 2-3 weeks after going live. They deduct: Commission (18-25%) + GST on commission (18%) + TDS (1%). Keep cash reserve for raw materials during this gap.
+        </div>
+    </div>
+</div>
+
+<!-- ==================== SWIGGY PAGE ==================== -->
+<div class="page" id="page-swiggy">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fff3e0; color: #fc8019;">🟠</div>
+            <div>
+                <h3>Swiggy Restaurant Partner Onboarding</h3>
+                <div class="subtitle">Complete step-by-step process</div>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <strong>Swiggy Commission:</strong> 15-25% per order (negotiable based on location & volume). Payout cycle: Weekly. Swiggy is very strong in Bangalore - this is their home city!
+        </div>
+
+        <div class="step">
+            <div class="step-number swiggy">1</div>
+            <div class="step-content">
+                <h4>Register on Swiggy Partner Portal</h4>
+                <p>Visit <b>partner.swiggy.com</b> → Click "Partner with us" → Select "Restaurant"</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number swiggy">2</div>
+            <div class="step-content">
+                <h4>Fill Restaurant Details</h4>
+                <ul>
+                    <li>Restaurant name & type: <b>Cloud Kitchen / Delivery Only</b></li>
+                    <li>Full address with landmark (Roopena Agrahara)</li>
+                    <li>Cuisine type: <b>North Indian, Biryani</b></li>
+                    <li>Owner details, phone, email</li>
+                    <li>Expected average order value</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number swiggy">3</div>
+            <div class="step-content">
+                <h4>Upload Documents</h4>
+                <ul>
+                    <li><b>FSSAI Registration/License</b> (same as Zomato)</li>
+                    <li><b>GST Certificate</b></li>
+                    <li><b>PAN Card</b></li>
+                    <li><b>Bank Account Details</b> (cancelled cheque)</li>
+                    <li><b>Menu with Pricing</b></li>
+                    <li><b>Kitchen Photos</b></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number swiggy">4</div>
+            <div class="step-content">
+                <h4>Swiggy Team Review & Kitchen Audit</h4>
+                <p>Swiggy may send a team for kitchen audit. Similar hygiene checks as Zomato. They also evaluate your kitchen's capacity for handling delivery volume.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number swiggy">5</div>
+            <div class="step-content">
+                <h4>Menu Setup on Swiggy Owner App</h4>
+                <p>Download <b>"Swiggy Owner"</b> app. Set up:</p>
+                <ul>
+                    <li>Menu categories (Meals, Biryani, Add-ons)</li>
+                    <li>Item names, descriptions, prices</li>
+                    <li>Food photos (good quality photos increase orders by 30%)</li>
+                    <li>Customization options (spice level, extra gravy, etc.)</li>
+                    <li>Preparation time estimates</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number swiggy">6</div>
+            <div class="step-content">
+                <h4>Set Timings & Go Live</h4>
+                <p>Set hours: <b>11:00 AM - 11:00 PM</b>. Swiggy onboarding: <b>5-10 days</b> in Bangalore (faster than other cities since Swiggy HQ is in Bangalore).</p>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Swiggy Tips for Bangalore:</strong>
+            <ul style="margin-top: 6px; padding-left: 16px; font-size: 0.9em;">
+                <li><b>Swiggy One:</b> Enable Swiggy One membership discounts - huge user base in Bangalore</li>
+                <li>Participate in Swiggy's promotional campaigns (they run frequent ones)</li>
+                <li>Keep menu prices competitive - Bangalore has high delivery competition</li>
+                <li>Offer free delivery for orders above a threshold to increase order value</li>
+                <li><b>Swiggy Instamart timing:</b> Lunch (12-2 PM) and Dinner (7-9 PM) peaks - be ready!</li>
+                <li>Roopena Agrahara covers Electronic City IT parks - target lunch orders heavily</li>
+            </ul>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Electronic City Advantage:</strong> Your location near Electronic City means HUGE lunch demand from IT workers. Offer affordable lunch combos (₹150-200 range) - this will be your bread and butter. Peak order time: 12:00 PM - 1:30 PM.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #f8f9fa; color: var(--text);">⚖️</div>
+            <div>
+                <h3>Zomato vs Swiggy Comparison</h3>
+                <div class="subtitle">Quick comparison for your reference</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Feature</th><th style="color:#e23744;">Zomato</th><th style="color:#fc8019;">Swiggy</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Commission</td><td>18-25%</td><td>15-25%</td></tr>
+                    <tr><td>Payout Cycle</td><td>Weekly (Monday)</td><td>Weekly</td></tr>
+                    <tr><td>Onboarding Time</td><td>7-15 days</td><td>5-10 days</td></tr>
+                    <tr><td>Bangalore Presence</td><td>Strong</td><td>Very Strong (HQ)</td></tr>
+                    <tr><td>Free Photoshoot</td><td>Yes (ask)</td><td>Sometimes</td></tr>
+                    <tr><td>Dashboard</td><td>Web + App</td><td>Swiggy Owner App</td></tr>
+                    <tr><td>First Payout</td><td>2-3 weeks</td><td>1-2 weeks</td></tr>
+                    <tr><td>Best For</td><td>Brand visibility</td><td>Volume orders</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Recommendation:</strong> Register on BOTH platforms simultaneously. Use the same menu and pricing. Swiggy will likely give more orders in your area (Electronic City) but Zomato helps with brand building and reviews.
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DAY 1 PLAN PAGE ==================== -->
+<div class="page" id="page-day1">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #d3f9d8; color: #2b8a3e;">📦</div>
+            <div>
+                <h3>Day 1 Quantity Planning</h3>
+                <div class="subtitle">Conservative approach to minimize food waste</div>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Reality Check:</strong> New cloud kitchens on Zomato/Swiggy get <b>5-15 orders on Day 1</b> (sometimes even 0-5). Don't over-prepare! You can always go offline if you run out. Better to sell out than throw away.
+        </div>
+
+        <h4 style="margin: 16px 0 8px;">Day 1 Raw Material (for ~15-20 orders)</h4>
+        <div class="qty-grid">
+            <div class="qty-card">
+                <div class="emoji">🐐</div>
+                <div class="item-name">Mutton</div>
+                <div class="quantity">2 kg</div>
+                <div class="note">~8-10 portions of curry</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🍗</div>
+                <div class="item-name">Chicken</div>
+                <div class="quantity">3 kg</div>
+                <div class="note">~12-15 portions of curry</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🍚</div>
+                <div class="item-name">Basmati Rice</div>
+                <div class="quantity">3 kg</div>
+                <div class="note">~15-20 portions</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🫓</div>
+                <div class="item-name">Atta (Wheat Flour)</div>
+                <div class="quantity">2 kg</div>
+                <div class="note">~50-60 chapatis</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🧅</div>
+                <div class="item-name">Onions</div>
+                <div class="quantity">3 kg</div>
+                <div class="note">Base for all gravies</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🍅</div>
+                <div class="item-name">Tomatoes</div>
+                <div class="quantity">2 kg</div>
+                <div class="note">Gravy base</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🫚</div>
+                <div class="item-name">Ginger-Garlic</div>
+                <div class="quantity">500 gm</div>
+                <div class="note">Paste ready</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🌶️</div>
+                <div class="item-name">Spices (Masala Kit)</div>
+                <div class="quantity">As needed</div>
+                <div class="note">Turmeric, chili, garam masala, etc.</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🥚</div>
+                <div class="item-name">Eggs</div>
+                <div class="quantity">1 tray (30)</div>
+                <div class="note">Egg curry + garnishing</div>
+            </div>
+            <div class="qty-card">
+                <div class="emoji">🧈</div>
+                <div class="item-name">Oil + Ghee</div>
+                <div class="quantity">2L + 500ml</div>
+                <div class="note">Cooking oil + ghee for rice/chapati</div>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Day 1 Total Raw Material Cost: ~₹2,500-3,500</strong><br>
+            This is enough for 15-20 complete meals. If you sell even 10 orders at ₹200+ avg, you recover your raw material cost.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">📈</div>
+            <div>
+                <h3>Weekly Scale-Up Plan</h3>
+                <div class="subtitle">Gradually increase quantity based on actual demand</div>
+            </div>
+        </div>
+
+        <div class="week-row">
+            <div class="week-label">Week 1</div>
+            <div class="week-bar"><div class="week-fill" style="width: 20%;">5-15 orders/day</div></div>
+        </div>
+        <div class="week-row">
+            <div class="week-label">Week 2</div>
+            <div class="week-bar"><div class="week-fill" style="width: 35%;">10-25 orders/day</div></div>
+        </div>
+        <div class="week-row">
+            <div class="week-label">Week 3</div>
+            <div class="week-bar"><div class="week-fill" style="width: 50%;">15-35 orders/day</div></div>
+        </div>
+        <div class="week-row">
+            <div class="week-label">Month 2</div>
+            <div class="week-bar"><div class="week-fill" style="width: 70%;">25-50 orders/day</div></div>
+        </div>
+        <div class="week-row">
+            <div class="week-label">Month 3</div>
+            <div class="week-bar"><div class="week-fill" style="width: 100%;">40-80+ orders/day</div></div>
+        </div>
+
+        <div class="info-box info">
+            <strong>Scaling Rule:</strong> Increase raw material by 30-50% each week based on previous week's actual orders. Track daily: orders received vs food prepared vs food wasted.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fff3bf; color: #e67700;">⏰</div>
+            <div>
+                <h3>Day 1 Schedule</h3>
+                <div class="subtitle">Minute-by-minute plan for your first day</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><b>7:00 AM</b></td><td>Buy fresh meat & vegetables</td><td>Morning market = freshest quality</td></tr>
+                    <tr><td><b>8:00 AM</b></td><td>Clean & prep ingredients</td><td>Wash, cut onions, marinate meat</td></tr>
+                    <tr><td><b>9:00 AM</b></td><td>Start gravy bases</td><td>Onion-tomato base, mutton slow cook</td></tr>
+                    <tr><td><b>10:00 AM</b></td><td>Cook rice, knead atta</td><td>Keep rice ready, dough resting</td></tr>
+                    <tr><td><b>10:30 AM</b></td><td>Final prep & packaging check</td><td>Containers, bags, napkins, cutlery ready</td></tr>
+                    <tr><td style="color: var(--accent);"><b>11:00 AM</b></td><td style="color: var(--accent);"><b>GO LIVE on Zomato & Swiggy!</b></td><td>Turn on both apps. First order incoming!</td></tr>
+                    <tr><td><b>11-2 PM</b></td><td>LUNCH RUSH</td><td>Peak time - focus 100% on orders</td></tr>
+                    <tr><td><b>2-5 PM</b></td><td>Slow period - prep for dinner</td><td>Fresh chapati dough, restock gravy</td></tr>
+                    <tr><td><b>5-6 PM</b></td><td>Evening prep</td><td>Fresh batch of curry if morning batch ran out</td></tr>
+                    <tr><td><b>6-10 PM</b></td><td>DINNER RUSH</td><td>Second peak - keep everything hot & ready</td></tr>
+                    <tr><td><b>10-11 PM</b></td><td>Wind down</td><td>Last orders, clean kitchen, note inventory</td></tr>
+                    <tr><td><b>11:00 PM</b></td><td>Go offline & close</td><td>Record: total orders, waste, earnings</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fce4ec; color: #e23744;">🛡️</div>
+            <div>
+                <h3>Food Waste Prevention Strategy</h3>
+                <div class="subtitle">Zero waste approach for first month</div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Cook in Small Batches</h4>
+                <p>Don't cook everything at once. Make gravy base, then cook portioned amounts as orders come in.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Go Offline When Low Stock</h4>
+                <p>If only 3 portions of mutton left, mark "Mutton Curry" as unavailable on Zomato/Swiggy. Better than disappointing customers with cancellations.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Repurpose Leftover Gravy</h4>
+                <p>Leftover chicken gravy → becomes base for next day's biryani masala. Leftover rice → egg fried rice next day.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Track Everything</h4>
+                <p>Maintain a simple notebook: Date | Item | Prepared | Sold | Wasted. This data will tell you exactly how much to cook each day.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== BUDGET PAGE ==================== -->
+<div class="page" id="page-budget">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #d3f9d8; color: #2b8a3e;">💰</div>
+            <div>
+                <h3>Budget Breakdown (Under ₹2 Lakh)</h3>
+                <div class="subtitle">One-time setup + first month operating cost</div>
+            </div>
+        </div>
+
+        <h4 style="margin-bottom: 12px;">One-Time Setup Costs</h4>
+        <div class="budget-row">
+            <span class="budget-label">Rent Deposit (2 months advance - typical)</span>
+            <span class="budget-amount">₹20,000 - 40,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Rent Agreement (stamp paper + registration)</span>
+            <span class="budget-amount">₹1,000 - 2,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Kitchen Equipment (if not already there)</span>
+            <span class="budget-amount">₹15,000 - 30,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Gas Connection (commercial cylinder)</span>
+            <span class="budget-amount">₹3,000 - 5,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Utensils & Cooking Equipment</span>
+            <span class="budget-amount">₹5,000 - 10,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">FSSAI + GST + Trade License fees</span>
+            <span class="budget-amount">₹2,000 - 5,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Packaging Materials (first stock)</span>
+            <span class="budget-amount">₹3,000 - 5,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Signboard / Branding (basic)</span>
+            <span class="budget-amount">₹2,000 - 5,000</span>
+        </div>
+
+        <h4 style="margin: 20px 0 12px;">Monthly Operating Costs</h4>
+        <div class="budget-row">
+            <span class="budget-label">Rent</span>
+            <span class="budget-amount">₹10,000 - 20,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Raw Materials (first month - conservative)</span>
+            <span class="budget-amount">₹25,000 - 40,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Gas (commercial cylinder refills)</span>
+            <span class="budget-amount">₹3,000 - 5,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Electricity</span>
+            <span class="budget-amount">₹2,000 - 4,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Packaging (monthly)</span>
+            <span class="budget-amount">₹3,000 - 5,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Helper salary (1 person)</span>
+            <span class="budget-amount">₹8,000 - 12,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Phone / Internet</span>
+            <span class="budget-amount">₹500 - 1,000</span>
+        </div>
+        <div class="budget-row">
+            <span class="budget-label">Miscellaneous</span>
+            <span class="budget-amount">₹2,000 - 3,000</span>
+        </div>
+
+        <div class="budget-row budget-total">
+            <span class="budget-label"><b>Total Initial Investment (Setup + Month 1)</b></span>
+            <span class="budget-amount">₹1,05,000 - ₹1,90,000</span>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Within your ₹2L budget!</strong> Start lean. You already have the kitchen space ready, which saves a lot. Focus spending on raw materials and packaging quality - this directly impacts reviews and repeat orders.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">📊</div>
+            <div>
+                <h3>Break-Even Analysis</h3>
+                <div class="subtitle">When will you start making profit?</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>Conservative</th><th>Moderate</th><th>Optimistic</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Daily Orders</td><td>15</td><td>30</td><td>50</td></tr>
+                    <tr><td>Avg Order Value</td><td>₹220</td><td>₹250</td><td>₹280</td></tr>
+                    <tr><td>Daily Revenue</td><td>₹3,300</td><td>₹7,500</td><td>₹14,000</td></tr>
+                    <tr><td>Monthly Revenue</td><td>₹99,000</td><td>₹2,25,000</td><td>₹4,20,000</td></tr>
+                    <tr><td>After Commission (22%)</td><td>₹77,220</td><td>₹1,75,500</td><td>₹3,27,600</td></tr>
+                    <tr><td>Monthly Expenses</td><td>₹55,000</td><td>₹75,000</td><td>₹1,00,000</td></tr>
+                    <tr><td><b>Monthly Profit</b></td><td style="color: var(--primary);"><b>₹22,220</b></td><td style="color: var(--accent);"><b>₹1,00,500</b></td><td style="color: var(--accent);"><b>₹2,27,600</b></td></tr>
+                    <tr><td>Break-Even Month</td><td>Month 3-4</td><td>Month 2</td><td>Month 1</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-box info">
+            <strong>Key Insight:</strong> At just 15 orders/day with ₹220 avg, you already cover expenses. The Electronic City IT crowd ordering lunch is your guaranteed base. Focus on getting those first 15 consistent daily orders.
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ALCOHOL PHASE 2 PAGE ==================== -->
+<div class="page" id="page-alcohol">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--phase2-light); color: var(--phase2);">🍷</div>
+            <div>
+                <h3>Phase 2: Adding Alcohol to Food</h3>
+                <div class="subtitle"><span class="phase-badge phase-2">PHASE 2 - After 2-3 Months</span></div>
+            </div>
+        </div>
+
+        <div class="info-box phase2-box">
+            <strong>Important Distinction:</strong> Using alcohol as a <b>cooking ingredient</b> (wine in gravy, beer-battered chicken, rum in desserts) is DIFFERENT from <b>serving alcohol as a beverage</b>. The rules and licenses are completely different.
+        </div>
+    </div>
+
+    <!-- Using alcohol as ingredient -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--phase2-light); color: var(--phase2);">🍳</div>
+            <div>
+                <h3>Option A: Alcohol as Cooking Ingredient</h3>
+                <div class="subtitle">Wine-based gravies, beer-battered items, rum desserts</div>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>This is the easier path for cloud kitchens.</strong> Many restaurants use wine, beer, and spirits in cooking without needing a liquor license.
+        </div>
+
+        <h4 style="margin: 12px 0 8px;">Menu Ideas with Alcohol-Infused Cooking:</h4>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Alcohol Used</th><th>Price Range</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Red Wine Mutton Curry</td><td>Red wine in gravy</td><td>₹380-450</td></tr>
+                    <tr><td>Beer Butter Chicken</td><td>Beer in butter sauce</td><td>₹280-350</td></tr>
+                    <tr><td>Whiskey Glazed Chicken</td><td>Whiskey reduction glaze</td><td>₹320-400</td></tr>
+                    <tr><td>Beer Battered Chicken Fry</td><td>Beer in batter</td><td>₹250-320</td></tr>
+                    <tr><td>Rum & Coke Ribs</td><td>Rum + cola marinade</td><td>₹350-450</td></tr>
+                    <tr><td>Wine-Braised Mutton Biryani</td><td>Red wine in biryani stock</td><td>₹400-500</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 style="margin: 16px 0 10px;">What You Need:</h4>
+        <div class="step">
+            <div class="step-number phase2">1</div>
+            <div class="step-content">
+                <h4>FSSAI Compliance</h4>
+                <p>FSSAI allows alcohol as a food ingredient. Your food label/packaging MUST clearly state: <b>"Contains alcohol-based ingredients"</b>. This is mandatory.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number phase2">2</div>
+            <div class="step-content">
+                <h4>Update FSSAI Registration</h4>
+                <p>Update your food items list on FSSAI to include alcohol-infused dishes. Log in to foscos.fssai.gov.in → Modify/Update → Add new food items.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number phase2">3</div>
+            <div class="step-content">
+                <h4>Source Alcohol from Licensed Shop</h4>
+                <p>Buy from any licensed wine/liquor shop. Keep purchase bills as proof for excise department if they ever ask. No special wholesale license needed for small quantities used in cooking.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number phase2">4</div>
+            <div class="step-content">
+                <h4>Zomato/Swiggy Menu Update</h4>
+                <p>Add new items with clear description: "Cooked with [wine/beer/rum]". Add a note about alcohol content. Some platforms may flag this - coordinate with your account manager.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number phase2">5</div>
+            <div class="step-content">
+                <h4>Packaging Labels</h4>
+                <p>Update packaging to include: Ingredient list with alcohol mentioned, "Not suitable for minors" advisory, and FSSAI number.</p>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Karnataka Excise Note:</strong> Karnataka has strict excise rules. While cooking with alcohol is generally permitted, keep records of all alcohol purchases. Store alcohol securely in kitchen. If Karnataka excise department inspects, show them purchase receipts and explain usage is for cooking only. Amount used per dish is small (50-100ml per batch).
+        </div>
+    </div>
+
+    <!-- Full liquor license -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: #fce4ec; color: #e23744;">🚫</div>
+            <div>
+                <h3>Option B: Serving Alcohol as Beverage (NOT Recommended for Cloud Kitchen)</h3>
+                <div class="subtitle">For reference only - very complex and expensive</div>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Why NOT recommended:</strong> Cloud kitchens typically CANNOT get liquor serving licenses. Karnataka requires physical dining space, and Zomato/Swiggy do NOT deliver alcohol in most cities. This option is only viable if you later convert to a dine-in restaurant.
+        </div>
+
+        <p style="font-size: 0.88em; color: var(--text-light); margin-bottom: 12px;">For future reference, if you ever expand to dine-in:</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>License</th><th>Details</th><th>Cost</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>CL-9 License</b></td>
+                        <td>Karnataka Excise - for restaurants serving Indian liquor with food</td>
+                        <td>₹5-15 Lakh/year</td>
+                    </tr>
+                    <tr>
+                        <td><b>CL-7 License</b></td>
+                        <td>For serving foreign liquor (imported)</td>
+                        <td>₹10-25 Lakh/year</td>
+                    </tr>
+                    <tr>
+                        <td><b>Requirements</b></td>
+                        <td>Minimum carpet area, distance from schools/temples, fire NOC, police NOC</td>
+                        <td>Varies</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Recommended Path:</strong> Start with Phase 1 (regular cloud kitchen) → After 2-3 months, add alcohol-infused cooking (Option A) → If business grows well and you want to expand, consider dine-in + liquor license in Year 2.
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MASTER CHECKLIST PAGE ==================== -->
+<div class="page" id="page-checklist">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--accent-light); color: var(--accent);">✅</div>
+            <div>
+                <h3>Master Checklist</h3>
+                <div class="subtitle">Track your progress - saved automatically in your browser</div>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+                <span id="checklistProgress" style="font-weight: 700; color: var(--accent);">0</span>
+                <span style="color: var(--text-light); font-size: 0.85em;">/ <span id="checklistTotal">0</span> completed</span>
+            </div>
+            <button class="reset-btn" onclick="resetChecklist()">Reset All</button>
+        </div>
+
+        <h4 class="section-title">Phase 0: Documentation (Do First!)</h4>
+        <div id="checklist-phase0"></div>
+
+        <h4 class="section-title">Phase 1: Registrations & Licenses</h4>
+        <div id="checklist-phase1"></div>
+
+        <h4 class="section-title">Phase 2: Platform Onboarding</h4>
+        <div id="checklist-phase2"></div>
+
+        <h4 class="section-title">Phase 3: Kitchen Setup</h4>
+        <div id="checklist-phase3"></div>
+
+        <h4 class="section-title">Phase 4: Pre-Launch</h4>
+        <div id="checklist-phase4"></div>
+
+        <h4 class="section-title">Phase 5: Launch Day</h4>
+        <div id="checklist-phase5"></div>
+
+        <h4 class="section-title">Phase 6: Post-Launch (Week 1)</h4>
+        <div id="checklist-phase6"></div>
+
+        <h4 class="section-title" style="color: var(--phase2);">Phase 7: Alcohol-Infused Menu (Month 3+)</h4>
+        <div id="checklist-phase7"></div>
+    </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ==================== CHECKLIST DATA ====================
+const checklistData = {
+    phase0: [
+        { id: 'p0_1', title: 'Get Rent Agreement done', desc: 'Stamp paper + registration on kaveri.karnataka.gov.in', cost: '₹1,000-2,000' },
+        { id: 'p0_2', title: 'Get NOC from Landlord', desc: 'Written no-objection for commercial food business use', cost: 'Free' },
+        { id: 'p0_3', title: 'Collect Property Tax Receipt from landlord', desc: 'Needed for trade license application', cost: 'Free' },
+        { id: 'p0_4', title: 'Get 10+ passport size photos', desc: 'Will be needed for multiple applications', cost: '₹100-200' },
+        { id: 'p0_5', title: 'Make 10 photocopies each of Aadhaar & PAN', desc: 'Needed for every registration', cost: '₹50-100' },
+        { id: 'p0_6', title: 'Prepare menu list with items & prices', desc: 'Needed for FSSAI and platform registration', cost: 'Free' },
+    ],
+    phase1: [
+        { id: 'p1_1', title: 'Apply for FSSAI Registration', desc: 'foscos.fssai.gov.in → Basic Registration → 7-15 days', cost: '₹100/year' },
+        { id: 'p1_2', title: 'Apply for GST Registration', desc: 'gst.gov.in → New Registration → 3-7 days', cost: 'Free' },
+        { id: 'p1_3', title: 'Register new Udyam Certificate', desc: 'udyamregistration.gov.in → NIC 56101 → Instant', cost: 'Free' },
+        { id: 'p1_4', title: 'Apply for BBMP Trade License', desc: 'bbmponline.karnataka.gov.in → 7-15 days', cost: '₹500-2,000' },
+        { id: 'p1_5', title: 'Open Current Bank Account', desc: 'Business account for Zomato/Swiggy payouts', cost: 'Free' },
+        { id: 'p1_6', title: 'Get Fire NOC (if applicable)', desc: 'Karnataka Fire & Emergency Services', cost: '₹500-2,000' },
+        { id: 'p1_7', title: 'Receive FSSAI Registration Certificate', desc: 'Download & print 14-digit number', cost: '' },
+        { id: 'p1_8', title: 'Receive GSTIN Number', desc: 'Note down for all registrations', cost: '' },
+    ],
+    phase2: [
+        { id: 'p2_1', title: 'Register on Zomato (zomato.com/business)', desc: 'Fill details → Upload documents → Wait for verification', cost: 'Free' },
+        { id: 'p2_2', title: 'Register on Swiggy (partner.swiggy.com)', desc: 'Fill details → Upload documents → Wait for verification', cost: 'Free' },
+        { id: 'p2_3', title: 'Upload menu & food photos on Zomato', desc: 'Use Zomato Restaurant Dashboard', cost: 'Free' },
+        { id: 'p2_4', title: 'Upload menu & food photos on Swiggy', desc: 'Use Swiggy Owner App', cost: 'Free' },
+        { id: 'p2_5', title: 'Request Zomato free photoshoot', desc: 'Ask your Zomato account manager', cost: 'Free' },
+        { id: 'p2_6', title: 'Set operating hours on both platforms', desc: '11:00 AM - 11:00 PM', cost: '' },
+        { id: 'p2_7', title: 'Zomato verification/kitchen visit done', desc: 'Keep kitchen clean & documents ready', cost: '' },
+        { id: 'p2_8', title: 'Swiggy verification/kitchen audit done', desc: 'Keep kitchen clean & documents ready', cost: '' },
+    ],
+    phase3: [
+        { id: 'p3_1', title: 'Commercial gas connection setup', desc: '19kg commercial cylinder', cost: '₹3,000-5,000' },
+        { id: 'p3_2', title: 'Buy/verify kitchen equipment', desc: 'Burner, kadai, cooker, tawa, pans', cost: '₹15,000-30,000' },
+        { id: 'p3_3', title: 'Buy utensils & serving equipment', desc: 'Ladles, knives, cutting board, containers', cost: '₹5,000-10,000' },
+        { id: 'p3_4', title: 'Order packaging materials', desc: 'Containers, bags, napkins, spoons, rubber bands', cost: '₹3,000-5,000' },
+        { id: 'p3_5', title: 'Print FSSAI stickers for packaging', desc: 'FSSAI number + kitchen name on every package', cost: '₹500-1,000' },
+        { id: 'p3_6', title: 'Install handwash station', desc: 'Required for hygiene compliance', cost: '₹500-1,000' },
+        { id: 'p3_7', title: 'Set up waste disposal system', desc: 'Wet waste + dry waste segregation', cost: '₹500' },
+        { id: 'p3_8', title: 'Buy weighing scale', desc: 'For portion control - critical for consistency', cost: '₹500-1,000' },
+    ],
+    phase4: [
+        { id: 'p4_1', title: 'Trial cooking day (test all menu items)', desc: 'Cook every item, taste, adjust seasoning', cost: '₹1,500-2,000' },
+        { id: 'p4_2', title: 'Test packaging (does food stay hot?)', desc: 'Pack food, wait 30 min, check quality', cost: '' },
+        { id: 'p4_3', title: 'Source raw material vendors', desc: 'Find reliable meat shop, vegetable vendor, grocery', cost: '' },
+        { id: 'p4_4', title: 'Set up daily tracking notebook', desc: 'Orders | Revenue | Waste | Stock tracking', cost: '₹50' },
+        { id: 'p4_5', title: 'Hire helper (if not done)', desc: '1 person for chopping, cleaning, packaging', cost: '₹8,000-12,000/month' },
+        { id: 'p4_6', title: 'Install UPI QR code (PhonePe/GPay)', desc: 'For any direct/walk-in orders', cost: 'Free' },
+        { id: 'p4_7', title: 'Display FSSAI certificate in kitchen', desc: 'Print and laminate, stick on wall', cost: '₹100' },
+    ],
+    phase5: [
+        { id: 'p5_1', title: 'Buy Day 1 raw materials (morning)', desc: '2kg mutton, 3kg chicken, 3kg rice, 2kg atta + vegetables', cost: '₹2,500-3,500' },
+        { id: 'p5_2', title: 'Prep by 10:30 AM', desc: 'All gravies, rice, dough ready', cost: '' },
+        { id: 'p5_3', title: 'Go LIVE on Zomato at 11 AM', desc: 'Turn on restaurant on Zomato dashboard', cost: '' },
+        { id: 'p5_4', title: 'Go LIVE on Swiggy at 11 AM', desc: 'Turn on restaurant on Swiggy Owner app', cost: '' },
+        { id: 'p5_5', title: 'Complete first order successfully!', desc: 'Package well, include thank you note + menu card', cost: '' },
+        { id: 'p5_6', title: 'End of Day 1 - Record everything', desc: 'Total orders, revenue, waste, learnings', cost: '' },
+    ],
+    phase6: [
+        { id: 'p6_1', title: 'Monitor & reply to all reviews', desc: 'Thank positive, address negative professionally', cost: '' },
+        { id: 'p6_2', title: 'Adjust quantities based on Day 1-3 data', desc: 'Increase popular items, reduce slow ones', cost: '' },
+        { id: 'p6_3', title: 'Enable promotional offers on platforms', desc: 'Discounts, combos, free delivery deals', cost: 'Varies' },
+        { id: 'p6_4', title: 'Optimize preparation time', desc: 'Target under 15 min per order', cost: '' },
+        { id: 'p6_5', title: 'First week revenue review', desc: 'Calculate actual food cost %, commission paid, profit', cost: '' },
+        { id: 'p6_6', title: 'Collect & file GST for first month', desc: 'Use ClearTax or hire CA', cost: '₹500-1,000/month' },
+    ],
+    phase7: [
+        { id: 'p7_1', title: 'Research alcohol-infused recipes', desc: 'Test wine mutton, beer chicken, whiskey glaze at home', cost: '₹1,000-2,000' },
+        { id: 'p7_2', title: 'Update FSSAI registration (add new items)', desc: 'foscos.fssai.gov.in → Modify/Update', cost: 'Free' },
+        { id: 'p7_3', title: 'Source cooking alcohol', desc: 'Buy from licensed shop, keep all receipts', cost: '₹2,000-3,000/month' },
+        { id: 'p7_4', title: 'Update packaging with alcohol disclaimer', desc: '"Contains alcohol-based ingredients" label', cost: '₹500-1,000' },
+        { id: 'p7_5', title: 'Add new items to Zomato & Swiggy', desc: 'With clear descriptions mentioning alcohol usage', cost: 'Free' },
+        { id: 'p7_6', title: 'Trial run with 2-3 alcohol dishes first', desc: 'Test demand before expanding full menu', cost: '' },
+        { id: 'p7_7', title: 'Monitor customer feedback on new items', desc: 'Adjust recipes based on reviews', cost: '' },
+    ]
+};
+
+// ==================== LOCAL STORAGE ====================
+const STORAGE_KEY = 'cloudkitchen_monk_checklist';
+const NAME_KEY = 'cloudkitchen_monk_name';
+
+function getCheckedItems() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch { return {}; }
+}
+
+function saveCheckedItems(items) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+// ==================== RENDER CHECKLIST ====================
+function renderChecklist() {
+    const checked = getCheckedItems();
+    let totalItems = 0;
+    let completedItems = 0;
+
+    Object.keys(checklistData).forEach(phase => {
+        const container = document.getElementById(`checklist-${phase}`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        checklistData[phase].forEach(item => {
+            totalItems++;
+            const isChecked = checked[item.id] || false;
+            if (isChecked) completedItems++;
+
+            const div = document.createElement('div');
+            div.className = `checklist-item ${isChecked ? 'completed' : ''}`;
+            div.onclick = () => toggleItem(item.id);
+            div.innerHTML = `
+                <div class="check-box">${isChecked ? '✓' : ''}</div>
+                <div style="flex:1;">
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-desc">${item.desc}</div>
+                    ${item.cost ? `<div class="item-cost">${item.cost}</div>` : ''}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    });
+
+    // Update progress
+    document.getElementById('checklistProgress').textContent = completedItems;
+    document.getElementById('checklistTotal').textContent = totalItems;
+
+    const pct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${completedItems}/${totalItems} (${pct}%)`;
+
+    // Update nav badge
+    updateNavBadges(completedItems, totalItems);
+}
+
+function toggleItem(id) {
+    const checked = getCheckedItems();
+    checked[id] = !checked[id];
+    saveCheckedItems(checked);
+    renderChecklist();
+}
+
+function resetChecklist() {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderChecklist();
+    }
+}
+
+function updateNavBadges(completed, total) {
+    const checklistNav = document.querySelector('[data-page="checklist"]');
+    let badge = checklistNav.querySelector('.nav-badge');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'nav-badge';
+        checklistNav.appendChild(badge);
+    }
+    badge.textContent = `${completed}/${total}`;
+}
+
+// ==================== NAME SELECTION ====================
+function selectName(card) {
+    document.querySelectorAll('.name-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    const name = card.querySelector('.name').textContent;
+    localStorage.setItem(NAME_KEY, name);
+    document.getElementById('selectedNameDisplay').style.display = 'block';
+    document.getElementById('selectedNameText').textContent = name;
+}
+
+function loadSelectedName() {
+    const saved = localStorage.getItem(NAME_KEY);
+    if (saved) {
+        document.querySelectorAll('.name-card').forEach(card => {
+            if (card.querySelector('.name').textContent === saved) {
+                card.classList.add('selected');
+            }
+        });
+        document.getElementById('selectedNameDisplay').style.display = 'block';
+        document.getElementById('selectedNameText').textContent = saved;
+    }
+}
+
+// ==================== NAVIGATION ====================
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    document.getElementById(`page-${pageId}`).classList.add('active');
+    document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => showPage(item.dataset.page));
+});
+
+// ==================== INIT ====================
+renderChecklist();
+loadSelectedName();
+</script>
+
+</body>
+</html>
